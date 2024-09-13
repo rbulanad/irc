@@ -11,6 +11,9 @@ int	main()
 	int	fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (fd < 0) exit(1);
 	if (bind(fd, (struct sockaddr *)&address, sizeof(address)) < 0)
-		close(fd), exit (1);
+		close(fd), std::cout << "ERROR: Failed bind." << std::endl, exit (1);
+	if (listen(fd, 3) < 0)
+		close(fd), std::cout << "ERROR: Failed listen." << std::endl, exit(1);
+	std::cout << "Currently listening on port: " << htons(address.sin_port) << std::endl;
 	return (0);
 }
