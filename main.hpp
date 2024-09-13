@@ -9,5 +9,7 @@
 #include <functional>
 #include <arpa/inet.h>
 #include <cstdlib>
+#include <sstream>
+#include <cstdlib>
 
 #endif
