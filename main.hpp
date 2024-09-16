@@ -11,5 +11,6 @@
 #include <cstdlib>
 #include <sstream>
 #include <cstdlib>
+#include <algorithm>
 
 #endif
