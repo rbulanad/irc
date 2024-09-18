@@ -12,5 +12,17 @@
 #include <sstream>
 #include <cstdlib>
 #include <algorithm>
+#include <vector>
+
+class	firstLog
+{
+	private:
+	
+	public:
+	firstLog();
+	~firstLog();
+	firstLog(const firstLog &dup);
+	firstLog &operator=(const firstLog &dup);
+};
 
 #endif

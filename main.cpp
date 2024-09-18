@@ -1,18 +1,37 @@
 #include "main.hpp"
 
-void	Parser(std::string cmd)
+std::vector<std::string>	TabExec(std::string cmd)
 {
-	std::string msg;
-	std::cout << cmd << std::endl;
-	if (cmd[0] == '\n')
+	cmd = cmd.erase(cmd.size() - 1);
+	std::cout << "CMD = " << cmd << std::endl;
+	if (cmd.find(' ') == std::string::npos)
 	{
-		 msg = "Skip";
+		const char *msg = "CMD is missing arguments \n";
 		throw (msg);
 	}
-	if (cmd.find('\n') != std::string::npos && cmd.find('\r') != std::string::npos && cmd.find(' ') != std::string::npos)
+	if (cmd == "CAP LS")
+		std::cout << "IGNORE CAP LS" << std::endl;
+
+	std::stringstream ss(cmd);
+	std::string word;
+	std::vector<std::string> vec;
+	while (!ss.eof())
+		getline(ss, word, ' '), vec.push_back(word); //split la ligne par les espaces et fill le vector
+	return (vec);
+}
+
+void	Parser(std::string cmd)
+{
+	std::vector<std::vector<std::string> > vecvec; //vec de vec, contient CMD en 1st place
+	std::cout << cmd << std::endl;
+	int y = 0;
+	for (int i = 0; cmd[i]; i++)
 	{
-		msg = "Not a command";
-		throw (msg);
+		if (cmd[i] == '\n' && cmd[i-1] == '\r')
+		{
+			vecvec.push_back(TabExec(cmd.substr(y, i - y)));
+			y = i + 1;
+		}
 	}
 }
 
@@ -50,9 +69,7 @@ int	main(int argc, char **argv)
 	int	new_fd = accept(fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
 	if (new_fd < 0)
 		close(fd), std::cout << "ERROR: Failed accept." << std::endl, exit(1);
-	//std::cout << "Connection accepted, waiting for authentification..." << std::endl;
-	//const char *msg = "Password? ";
-	//send (new_fd, msg, strlen(msg), 0);
+	std::cout << "Connection accepted, waiting for authentification..." << std::endl;
 	char buffer[1024] = {0};
 	memset(buffer, 0, sizeof(buffer));
 	while (1)
@@ -61,24 +78,17 @@ int	main(int argc, char **argv)
 		if (receive < 1)
 			break ;
 		std::string iencli(buffer, receive);
-		try { Parser(iencli); }
+		try
+		{
+			Parser(iencli);
+		}
 		catch (std::string msg)
 		{
 			std::cerr << msg << std::endl;
+			close(new_fd);
+			close(fd);
 		}
 	}
-	/*clientPass.erase(std::remove(clientPass.begin(), clientPass.end(), '\n'), clientPass.end());
-	clientPass.erase(std::remove(clientPass.begin(), clientPass.end(), '\r'), clientPass.end());
-	f (clientPass != servPass)
-	{
-		msg = "Wrong password.";
-		send (new_fd, msg, strlen(msg), 0);
-	}
-	else
-	{
-		msg = "Good password.";
-		send (new_fd, msg, strlen(msg), 0);
-	}*/
 	close(new_fd);
 	close(fd);
 	return (0);
